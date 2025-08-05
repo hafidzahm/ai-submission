@@ -5,31 +5,17 @@ const LibraryItemBubbleChat = ({ item, type }) => {
         <BookItemBubbleChat item={item} />
       )}
 
-      {type === "jurnal" && item?.hasOwnProperty("publikasi") === true && (
+      {type === "jurnal" && item?.hasOwnProperty("namaPublikasi") === true && (
         <JournalItemBubbleChat item={item} />
       )}
 
-      {type === "skripsi" && item?.hasOwnProperty("mahasiswa") === true && (
+      {type === "skripsi" && item?.hasOwnProperty("namaMahasiswa") === true && (
         <SkripsiItemBubbleChat item={item} />
-      )}
-      {type === "publikasi" && item?.hasOwnProperty("volume") === true && (
-        <PublicationItemBubbleChat item={item} />
       )}
     </>
   );
 };
 
-const PublicationItemBubbleChat = ({ item }) => {
-  return (
-    <div className="mt-5 rounded-bl-none bg-blue-200 p-5 text-black">
-      <h3>
-        Nama: <span className="font-bold">{item.name || ""}</span>{" "}
-      </h3>
-      <p>Volume: {item?.volume || ""} </p>
-      <p>Tahun: {item?.tahun || ""}</p>
-    </div>
-  );
-};
 const SkripsiItemBubbleChat = ({ item }) => {
   return (
     <div className="mt-5 rounded-bl-none bg-blue-200 p-5 text-black">
@@ -37,7 +23,7 @@ const SkripsiItemBubbleChat = ({ item }) => {
         Judul: <span className="font-bold">{item?.judul || ""}</span>{" "}
       </h3>
       <p>Sinopsis: {item?.abstrak || ""}</p>
-      <p>Nama Mahasiswa: {item?.mahasiswa?.name || ""} </p>
+      <p>Nama Mahasiswa: {item?.namaMahasiswa || ""} </p>
       <p>Tahun Skripsi: {item?.tahun || ""}</p>
     </div>
   );
@@ -50,13 +36,7 @@ const JournalItemBubbleChat = ({ item }) => {
       <h3>
         Judul: <span className="font-bold">{item?.judul || ""}</span>{" "}
       </h3>
-      <p>Sinopsis: {item?.abstrak || ""}</p>
-
-      <p>
-        Publikasi: {item?.publikasi?.name || ""}, {item?.publikasi?.tahun || ""}
-        , {item?.publikasi?.volume || ""}
-      </p>
-      <p>Jurnal tersedia: {item?.tersedia || ""}</p>
+      <p>Publikasi: {item?.namaPublikasi || ""}</p>
     </div>
   );
 };
@@ -68,8 +48,8 @@ const BookItemBubbleChat = ({ item }) => {
         Judul: <span className="font-bold">{item?.judul || ""}</span>{" "}
       </h3>
       <p>Sinopsis: {item?.sinopsis || ""}</p>
-      <p>Pengarang: {item?.pengarang?.name || ""}</p>
-      <p>Penerbit: {item?.penerbit?.name || ""}</p>
+      <p>Pengarang: {item?.pengarang?.nama || ""}</p>
+      <p>Penerbit: {item?.penerbit?.nama || ""}</p>
       <p>Lokasi buku: {item?.lokasi || ""}</p>
     </div>
   );

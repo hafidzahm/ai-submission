@@ -10,7 +10,8 @@ const App = () => {
       message: `
       Selamat datang di Perpustakaan! 👋
       <ul>
-        <li>Saya siap membantu Anda mencari buku dan koleksi perpustakaan.</li>
+        <li>Saya siap membantu Anda mencari buku, jurnal, dan skripsi.</li>
+        <li>Mulai dengan bertanya, rekomendasiin aku buku dong!</li>
       </ul>
       Silakan ketik pertanyaan Anda!`,
       timestamp: new Date().toLocaleTimeString([], {
@@ -28,11 +29,11 @@ const App = () => {
       setLoading(true);
       const lowerCaseMessage = userMessage.toLowerCase();
       console.log(lowerCaseMessage, "<----sentRequestToChatBotAI");
-      const response = await fetch("/api/chatbot", {
+      const response = await fetch("http://localhost:3000/api/chat", {
         method: "POST",
         body: JSON.stringify({
           messageRequestFromClient: lowerCaseMessage,
-          historyMessage: histories,
+          history: histories,
         }),
         headers: {
           "Content-Type": "application/json",

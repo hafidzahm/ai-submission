@@ -1,79 +1,51 @@
 function promptLibraryAssistant(prompt) {
   return `
-        Anda adalah **Asisten Perpustakaan USD** yang berdedikasi dan memiliki pengetahuan mendalam tentang 
+        Anda adalah **Asisten Perpustakaan** yang berdedikasi dan memiliki pengetahuan mendalam tentang 
     seluruh koleksi yang tersedia di perpustakaan. Anda HANYA memiliki akses ke **database lokal** 
     yaitu: ${prompt} yang berisi semua informasi item dengan rincian:
    
-   type Buku =  {
-    id: string;
-    judul: string;
-    abstrak?: string;
-    jumlah: number;
-    tersedia: number;
-    dipinjam: number;
-    count?: number;
-    penerbit_id: string;
-    pengarang_id: string;
-    penerbit: Penerbit;
-    pengarang: Pengarang;
-    rak: string;
-    sinopsis: string;
-    lokasi: string;
-    updatedAt?: string;
-    createdAt?: string;
-  },
+   type Buku =  {
+    id: string;
+    judul: string;
+    abstrak?: string;
+    jumlah: number;
+    tersedia: number;
+    dipinjam: number;
+    penerbit: Penerbit;
+    pengarang: Pengarang;
+    rak: string;
+    sinopsis: string;
+    lokasi: string;
+    updatedAt?: string;
+    createdAt?: string;
+  },
 
-  type Penerbit= {
-    id: string;
-    name: string;
-  }
-
-  type Pengarang= {
-    id: string;
-    name: string;
-    nationality: string;
-  }
-
-   type Jurnal = {
-    id: string;
-    judul: string;
-    abstrak?: string;
-    jumlah: number;
-    tersedia: number;
-    dipinjam: number;
-    count?: number;
-    jurnal_id: string;
-    publikasi: Publikasi;
-    updatedAt?: string;
-    createdAt?: string;
-  }
-    type Publikasi= {
-    id: string;
-    name: string;
-    volume: string;
-    tahun: string;
-  }
+   type Jurnal = {
+    id: string;
+    judul: string;
+    abstrak?: string;
+    jumlah: number;
+    tersedia: number;
+    dipinjam: number;
+    namaPublikasi: string;
+    updatedAt?: string;
+    createdAt?: string;
+  }
 , dan
-    type Skripsi = {
-    id: string;
-    judul: string;
-    abstrak?: string;
-    count?: number;
-    nim: string;
-    tahun: string;
-    updatedAt?: string;
-    createdAt?: string;
-    mahasiswa: Mahasiswa;
+    type Skripsi = {
+    id: string;
+    judul: string;
+    abstrak?: string;
+    count?: number;
+    nim: string;
+    tahun: string;
+    updatedAt?: string;
+    createdAt?: string;
+    namaMahasiswa: string;
+    programStudi: string;
+    topikSkripsi: string
 }
-    type Mahasiswa = {
-    id: string;
-    name: string;
-    masuk: string;
-    lulus: string;
-    ipk: string;
-    fakultas?: string;
-    program_studi?: string;
-  }
+
 
       **TIDAK AKAN MENCARI DI INTERNET**.
       **JIKA DATA YANG DIMINTA TIDAK ADA, MAKA JANGAN CARI DATA DILUAR DATABASE LOKAL, 
@@ -201,10 +173,12 @@ function handleGeminiResponse(responseChat) {
 
 function handleHistoryChat(histories) {
   try {
+    // console.log(histories, "<------ history");
+
     let history = [];
 
     if (!histories) {
-      return [];
+      history = [];
     } else {
       history = histories;
     }
@@ -229,6 +203,10 @@ function handleHistoryChat(histories) {
       } else {
         history = histories;
       }
+    }
+
+    if (history.length > 1) {
+      console.log("ada history dari user");
     }
 
     return history;

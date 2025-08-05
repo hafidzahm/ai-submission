@@ -14,7 +14,13 @@ const GEMINI_URI = process.env.GEMINI_URI;
 const ai = new GoogleGenAI({ apiKey: GEMINI_URI });
 const stringDb = database;
 const prompt = promptLibraryAssistant(stringDb);
+const cors = require("cors");
 
+app.use(
+  cors({
+    origin: "*",
+  })
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -30,7 +36,13 @@ app.post("/api/chat", async (req, res) => {
         .json({ message: "messageRequestFromClient required" });
     }
 
-    const historyFromUser = await handleHistoryChat(history);
+    if (!history) {
+      console.log("histori kosong");
+    }
+
+    const historyFromUser = await handleHistoryChat(JSON.parse(history));
+    // const historyFromUser = await handleHistoryChat(history);
+    // const historyFromUser = [];
 
     const chat = ai.chats.create({
       model: "gemini-2.5-flash",

@@ -11,6 +11,9 @@ const {
 const app = express();
 const port = 3000;
 const GEMINI_URI = process.env.GEMINI_URI;
+if (!GEMINI_URI) {
+  console.log("error on ENV: please fill GEMINI_API_URL on GEMINI_URI first.");
+}
 const ai = new GoogleGenAI({ apiKey: GEMINI_URI });
 const stringDb = database;
 const prompt = promptLibraryAssistant(stringDb);

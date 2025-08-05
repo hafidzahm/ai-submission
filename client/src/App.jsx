@@ -1,35 +1,157 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState } from "react";
+import ChatbotHeaderCard from "./components/ChatbotHeaderCard";
+import ChatbotMessagesCard from "./components/ChatbotMesagesCard";
 
-function App() {
-  const [count, setCount] = useState(0)
+const App = () => {
+  const [messages, setMessages] = useState([
+    {
+      id: 1,
+      sender: "bot",
+      message: `
+      Selamat datang di Perpustakaan! 👋
+      <ul>
+        <li>Saya siap membantu Anda mencari buku dan koleksi perpustakaan.</li>
+      </ul>
+      Silakan ketik pertanyaan Anda!`,
+      timestamp: new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+    },
+  ]);
+  const [loading, setLoading] = useState(false);
+  const [inputMessage, setInputMessage] = useState("");
+  const [agreePrivacy, setAgreePrivacy] = useState(false);
+
+  const sentRequestToChatBotAI = async (userMessage, histories) => {
+    try {
+      setLoading(true);
+      const lowerCaseMessage = userMessage.toLowerCase();
+      console.log(lowerCaseMessage, "<----sentRequestToChatBotAI");
+      const response = await fetch("/api/chatbot", {
+        method: "POST",
+        body: JSON.stringify({
+          messageRequestFromClient: lowerCaseMessage,
+          historyMessage: histories,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const responseJson = await response.json();
+      console.log(responseJson);
+
+      if (!response.ok) {
+        console.log(responseJson.message || "Error occurred");
+      }
+
+      console.log(response, "response from api/chatbot");
+
+      setLoading(false);
+      return responseJson; // Assuming the API returns a 'reply' field
+    } catch (error) {
+      console.log(error, "<--- sentRequestToApiChatbot");
+      setLoading(false);
+      return "An error occurred"; // Return a fallback message
+    }
+  };
+
+  const handleTagClick = (tagText) => {
+    setInputMessage(tagText);
+  };
+
+  const sendMessage = async () => {
+    if (inputMessage.trim() === "") return;
+    if (!agreePrivacy) {
+      alert(
+        "Anda harus menyetujui kebijakan privasi untuk menggunakan fitur chat."
+      );
+      return;
+    }
+
+    const newMessage = {
+      id: messages.length + 1,
+      sender: "user",
+      message: inputMessage.trim(),
+      timestamp: new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+    };
+
+    console.log(newMessage, "<-----sendMessage");
+    // array messages baru dan messages sebelumnya
+    const bulkMessages = [...messages, newMessage];
+    const formattedHistory = bulkMessages.map((message) => {
+      if (message.sender === "bot") {
+        return { role: "model", parts: [{ text: message.message }] };
+      } else {
+        return { role: "user", parts: [{ text: message.message }] };
+      }
+    });
+    console.log(formattedHistory, "histories");
+
+    setMessages((prevMessages) => [...prevMessages, newMessage]);
+    setInputMessage("");
+
+    // setTimeout(async () => {
+    const botReply = await sentRequestToChatBotAI(
+      newMessage.message,
+      JSON.stringify(formattedHistory)
+    );
+    console.log(botReply, "botReply");
+
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      {
+        id: prevMessages.length + 1,
+        sender: "bot",
+        message:
+          botReply &&
+          botReply.response &&
+          typeof botReply.response.message === "string"
+            ? botReply.response.message
+            : botReply && typeof botReply.response === "string"
+            ? botReply.response
+            : "Harap ulangi beberapa saat lagi, reload browser jika perlu",
+        results:
+          botReply &&
+          botReply.response &&
+          Array.isArray(botReply.response.result)
+            ? botReply.response.result
+            : [],
+        timestamp: new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+        type:
+          botReply &&
+          botReply.response &&
+          typeof botReply.response.type === "string"
+            ? botReply.response.type
+            : "unidentified",
+      },
+    ]);
+
+    // }, 1000);
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <div className="w-full">
+      <ChatbotHeaderCard onTagClick={handleTagClick} />
 
-export default App
+      <ChatbotMessagesCard
+        messages={messages}
+        inputMessage={inputMessage}
+        setInputMessage={setInputMessage}
+        agreePrivacy={agreePrivacy}
+        setAgreePrivacy={setAgreePrivacy}
+        sendMessage={sendMessage}
+        loading={loading}
+      />
+    </div>
+  );
+};
+
+export default App;
